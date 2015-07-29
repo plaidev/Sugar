@@ -3181,6 +3181,7 @@
           d.addMinutes(-d.getTimezoneOffset());
         }
       } else if(relative) {
+        d = new Date();
         d.advance(set);
       } else {
         if(d._utc) {
@@ -3814,6 +3815,12 @@
       // them, the discrepancy between the creation of the 2 dates means that
       // they may actually be 15.0001 hours apart. Milliseconds don't have
       // fractions, so they won't be subject to this error margin.
+      function fixTimeDifference() {
+        var a = Date.create();
+        var b = new Date();
+        this.setTime(this.getTime() - (a.getTime() - b.getTime()));
+      }
+
       function applyErrorMargin(ms) {
         var num      = ms / multiplier,
             fraction = num % 1,
@@ -3848,6 +3855,7 @@
       }
       if(i < 4) {
         methods['beginningOf' + caps] = function() {
+          fixTimeDifference.call(this);
           var set = {};
           switch(name) {
             case 'year':  set['year']    = callDateGet(this, 'FullYear'); break;
@@ -4861,7 +4869,6 @@
   buildRelativeAliases();
   buildUTCAliases();
   setDateProperties();
-
 
   /***
    * @package Range
