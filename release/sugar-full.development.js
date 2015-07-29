@@ -3831,9 +3831,11 @@
         return num < 0 ? ceil(num) : floor(num);
       }
       since = function(f, localeCode) {
+        fixTimeDifference.call(this);
         return applyErrorMargin(this.getTime() - date.create(f, localeCode).getTime());
       };
       until = function(f, localeCode) {
+        fixTimeDifference.call(this);
         return applyErrorMargin(date.create(f, localeCode).getTime() - this.getTime());
       };
       methods[name+'sAgo']     = until;
@@ -3841,6 +3843,7 @@
       methods[name+'sSince']   = since;
       methods[name+'sFromNow'] = since;
       methods[u.addMethod] = function(num, reset) {
+        fixTimeDifference.call(this);
         var set = {};
         set[name] = num;
         return this.advance(set, reset);
@@ -3849,6 +3852,7 @@
       if(i < 3) {
         ['Last','This','Next'].forEach(function(shift) {
           methods['is' + shift + caps] = function() {
+            fixTimeDifference.call(this);
             return compareDate(this, shift + ' ' + name, 'en');
           };
         });
@@ -3866,6 +3870,7 @@
           return this.set(set, true);
         };
         methods['endOf' + caps] = function() {
+          fixTimeDifference.call(this);
           var set = { 'hours': 23, 'minutes': 59, 'seconds': 59, 'milliseconds': 999 };
           switch(name) {
             case 'year':  set['month']   = 11; set['day'] = 31; break;
