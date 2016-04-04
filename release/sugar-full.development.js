@@ -2946,8 +2946,11 @@
   }
 
   function getExtendedDate(f, localeCode, prefer, forceUTC, timezoneOffsetMinutes) {
-    var d, relative, baseLocalization, afterCallbacks, loc, set, unit, unitIndex, weekday, num, tmp;
+    var d, relative, relativeDay, baseLocalization, afterCallbacks, loc, set, unit, unitIndex, weekday, num, tmp;
 
+    if (!timezoneOffsetMinutes) {
+      timezoneOffsetMinutes = 0;
+    }
     d = getNewDate();
 
     afterCallbacks = [];
@@ -3077,8 +3080,11 @@
             // Relative day localizations such as "today" and "tomorrow".
             if(set['day'] && (tmp = loc.modifiersByName[set['day']])) {
               set['day'] = tmp.value;
+              // Shift timezoneOffsetMinutes backwards for getting local day.
+              d.addMinutes(-timezoneOffsetMinutes);
               d.reset();
               relative = true;
+              relativeDay = true;
             // If the day is a weekday, then set that instead.
             } else if(set['day'] && (weekday = loc.getWeekday(set['day'])) > -1) {
               delete set['day'];
@@ -3175,15 +3181,19 @@
         // of arguments so simply passing in undefined won't work.
         if(f !== 'now') {
           d = new date(f);
-          d.addMinutes(timezoneOffsetMinutes);
         }
         if(forceUTC) {
           // Falling back to system date here which cannot be parsed as UTC,
           // so if we're forcing UTC then simply add the offset.
           d.addMinutes(-timezoneOffsetMinutes);
           d.addMinutes(-d.getTimezoneOffset());
+        } else {
+          d.addMinutes(timezoneOffsetMinutes);
         }
       } else if(relative) {
+        if (relativeDay) {
+          d.addMinutes(timezoneOffsetMinutes);
+        }
         d.advance(set);
       } else {
         if(d._utc) {
