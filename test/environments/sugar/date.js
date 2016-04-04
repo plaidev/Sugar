@@ -2770,8 +2770,8 @@ test('Date', function () {
   dateEqual(Date.create('08/25/1978 12:04'), new Date(1978, 7, 25, 12, 4), 'Date#create | timezoneOffsetMinutes | 08/25/1978 12:04');
 
   var localNow = (new Date()).addMinutes(60);
-  dateEqual(Date.create('now', '', -60), (new Date()).addMinutes(-60), 'Date#create | timezoneOffsetMinutes | Now');
-  dateEqual(Date.create('Just now', '', -60), (new Date()).addMinutes(-60), 'Date#create | timezoneOffsetMinutes | Just Now');
+  dateEqual(Date.create('now', '', -60), (new Date()), 'Date#create | timezoneOffsetMinutes | Now');
+  dateEqual(Date.create('Just now', '', -60), (new Date()), 'Date#create | timezoneOffsetMinutes | Just Now');
   dateEqual(Date.create('today', '', -60), (new Date(localNow.getFullYear(), localNow.getMonth(), localNow.getDate())).addMinutes(-60), 'Date#create | timezoneOffsetMinutes | Today');
   dateEqual(Date.create('yesterday', '', -60), (new Date(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() - 1)).addMinutes(-60), 'Date#create | timezoneOffsetMinutes | Yesterday');
   dateEqual(Date.create('tomorrow', '', -60), (new Date(localNow.getFullYear(), localNow.getMonth(), localNow.getDate() + 1)).addMinutes(-60), 'Date#create | timezoneOffsetMinutes | Tomorrow');

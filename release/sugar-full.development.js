@@ -3181,14 +3181,13 @@
         // of arguments so simply passing in undefined won't work.
         if(f !== 'now') {
           d = new date(f);
+          d.addMinutes(timezoneOffsetMinutes);
         }
         if(forceUTC) {
           // Falling back to system date here which cannot be parsed as UTC,
           // so if we're forcing UTC then simply add the offset.
           d.addMinutes(-timezoneOffsetMinutes);
           d.addMinutes(-d.getTimezoneOffset());
-        } else {
-          d.addMinutes(timezoneOffsetMinutes);
         }
       } else if(relative) {
         if (relativeDay) {
