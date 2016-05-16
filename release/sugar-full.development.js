@@ -8600,14 +8600,14 @@ Date.addLocale('ja', {
     { 'name': 'sign', 'src': '後', 'value': 1 },
     { 'name': 'edge', 'src': '始|初日|頭', 'value': 1 },
     { 'name': 'edge', 'src': '末|末日|尻', 'value': -2 },
-    { 'name': 'shift', 'src': '一昨昨昨|先先先先|前前前前', 'value': -4 },
-    { 'name': 'shift', 'src': '一昨昨|先先先|前前前', 'value': -3 },
-    { 'name': 'shift', 'src': '一昨|先先|前前', 'value': -2 },
+    { 'name': 'shift', 'src': '一昨昨昨|一昨々々|先々々々|前々々々|先先先先|前前前前', 'value': -4 },
+    { 'name': 'shift', 'src': '一昨昨|一昨々|先々々|前々々|先先先|前前前', 'value': -3 },
+    { 'name': 'shift', 'src': '一昨|先々|前々|先先|前前', 'value': -2 },
     { 'name': 'shift', 'src': '昨|先|前|去', 'value': -1 },
     { 'name': 'shift', 'src': '今|本|当', 'value': 0 },
     { 'name': 'shift', 'src': '来|次|翌|明', 'value': 1 },
-    { 'name': 'shift', 'src': '再来|次次|翌翌|明後', 'value': 2 },
-    { 'name': 'shift', 'src': '再再来|次次次|翌翌翌', 'value': 3 }
+    { 'name': 'shift', 'src': '再来|次々|翌々|明後|次次|翌翌', 'value': 2 },
+    { 'name': 'shift', 'src': '再々来|次々々|翌々々|明々後|次次次|翌翌翌|明明後|再再来', 'value': 3 }
   ],
   'dateParse': [
     '{num}{unit}{sign}'
