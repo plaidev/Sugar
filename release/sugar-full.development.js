@@ -2853,9 +2853,9 @@
     }).join('|');
   }
 
-  function getNewDate() {
+  function getNewDate(timezoneString) {
     var fn = date.SugarNewDate;
-    return fn ? fn() : new date;
+    return fn && timezoneString ? fn(timezoneString) : new date;
   }
 
   // Date argument helpers
@@ -2945,13 +2945,10 @@
     });
   }
 
-  function getExtendedDate(f, localeCode, prefer, forceUTC, timezoneOffsetMinutes) {
-    var d, relative, relativeDay, baseLocalization, afterCallbacks, loc, set, unit, unitIndex, weekday, num, tmp;
+  function getExtendedDate(f, localeCode, prefer, forceUTC, timezoneString) {
+    var d, relative, baseLocalization, afterCallbacks, loc, set, unit, unitIndex, weekday, num, tmp;
 
-    if (!timezoneOffsetMinutes) {
-      timezoneOffsetMinutes = 0;
-    }
-    d = getNewDate();
+    d = getNewDate(timezoneString);
 
     afterCallbacks = [];
 
@@ -3059,7 +3056,7 @@
 
             // If the year is 2 digits then get the implied century.
             if(set['year'] && set.yearAsString.length === 2) {
-              set['year'] = getYearFromAbbreviation(set['year']);
+              set['year'] = getYearFromAbbreviation(set['year'], timezoneString);
             }
 
             // Set the month which may be localized.
@@ -3080,11 +3077,8 @@
             // Relative day localizations such as "today" and "tomorrow".
             if(set['day'] && (tmp = loc.modifiersByName[set['day']])) {
               set['day'] = tmp.value;
-              // Shift timezoneOffsetMinutes backwards for getting local day.
-              d.addMinutes(-timezoneOffsetMinutes);
               d.reset();
               relative = true;
-              relativeDay = true;
             // If the day is a weekday, then set that instead.
             } else if(set['day'] && (weekday = loc.getWeekday(set['day'])) > -1) {
               delete set['day'];
@@ -3181,18 +3175,13 @@
         // of arguments so simply passing in undefined won't work.
         if(f !== 'now') {
           d = new date(f);
-          d.addMinutes(timezoneOffsetMinutes);
         }
         if(forceUTC) {
           // Falling back to system date here which cannot be parsed as UTC,
           // so if we're forcing UTC then simply add the offset.
-          d.addMinutes(-timezoneOffsetMinutes);
           d.addMinutes(-d.getTimezoneOffset());
         }
       } else if(relative) {
-        if (relativeDay) {
-          d.addMinutes(timezoneOffsetMinutes);
-        }
         d.advance(set);
       } else {
         if(d._utc) {
@@ -3201,7 +3190,6 @@
           d.reset();
         }
         updateDate(d, set, true, false, prefer);
-        d.addMinutes(timezoneOffsetMinutes);
       }
       fireCallbacks();
       // A date created by parsing a string presumes that the format *itself* is UTC, but
@@ -3218,8 +3206,8 @@
   }
 
   // If the year is two digits, add the most appropriate century prefix.
-  function getYearFromAbbreviation(year) {
-    return round(callDateGet(getNewDate(), 'FullYear') / 100) * 100 - round(year / 100) * 100 + year;
+  function getYearFromAbbreviation(year, timezoneString) {
+    return round(callDateGet(getNewDate(timezoneString), 'FullYear') / 100) * 100 - round(year / 100) * 100 + year;
   }
 
   function getShortHour(d) {
@@ -3247,9 +3235,9 @@
     return [value, unitIndex, ms];
   }
 
-  function getRelativeWithMonthFallback(date) {
+  function getRelativeWithMonthFallback(date, timezoneString) {
     var adu = getAdjustedUnit(date.millisecondsFromNow());
-    if(allowMonthFallback(date, adu)) {
+    if(allowMonthFallback(date, adu, timezoneString)) {
       // If the adjusted unit is in months, then better to use
       // the "monthsfromNow" which applies a special error margin
       // for edge cases such as Jan-09 - Mar-09 being less than
@@ -3262,11 +3250,11 @@
     return adu;
   }
 
-  function allowMonthFallback(date, adu) {
+  function allowMonthFallback(date, adu, timezoneString) {
     // Allow falling back to monthsFromNow if the unit is in months...
     return adu[1] === 6 ||
     // ...or if it's === 4 weeks and there are more days than in the given month
-    (adu[1] === 5 && adu[0] === 4 && date.daysFromNow() >= getNewDate().daysInMonth());
+    (adu[1] === 5 && adu[0] === 4 && date.daysFromNow() >= getNewDate(timezoneString).daysInMonth());
   }
 
 
@@ -3360,18 +3348,18 @@
     return result;
   }
 
-  function formatDate(date, format, relative, localeCode) {
+  function formatDate(date, format, relative, localeCode, timezoneString) {
     var adu;
     if(!date.isValid()) {
       return 'Invalid Date';
     } else if(Date[format]) {
       format = Date[format];
     } else if(isFunction(format)) {
-      adu = getRelativeWithMonthFallback(date);
+      adu = getRelativeWithMonthFallback(date, timezoneString);
       format = format.apply(date, adu.concat(getLocalization(localeCode)));
     }
     if(!format && relative) {
-      adu = adu || getRelativeWithMonthFallback(date);
+      adu = adu || getRelativeWithMonthFallback(date, timezoneString);
       // Adjust up if time is in ms, as this doesn't
       // look very good for a standard relative date.
       if(adu[1] === 0) {
@@ -3592,7 +3580,7 @@
   }
 
   function createDate(args, prefer, forceUTC) {
-    var f, localeCode, timezoneOffsetMinutes;
+    var f, localeCode, timezoneString;
     if(isNumber(args[1])) {
       // If the second argument is a number, then we have an enumerated constructor type as in "new Date(2003, 2, 12);"
       f = collectDateArguments(args)[0];
@@ -3600,12 +3588,12 @@
       f          = args[0];
       localeCode = args[1];
       if (args[2]) {
-        timezoneOffsetMinutes = args[2];
+        timezoneString = args[2];
       } else {
-        timezoneOffsetMinutes = 0;
+        timezoneString = null;
       }
     }
-    return getExtendedDate(f, localeCode, prefer, forceUTC, timezoneOffsetMinutes).date;
+    return getExtendedDate(f, localeCode, prefer, forceUTC, timezoneString).date;
   }
 
   function invalidateDate(d) {
@@ -4498,8 +4486,8 @@
      *   });                                                      -> ex. 1 day ago
      *
      ***/
-    'format': function(f, localeCode) {
-      return formatDate(this, f, false, localeCode);
+    'format': function(f, localeCode, timezoneString) {
+      return formatDate(this, f, false, localeCode, timezoneString);
     },
 
      /***
@@ -4517,12 +4505,12 @@
      *   });                                      -> ex. 5 months ago
      *
      ***/
-    'relative': function(fn, localeCode) {
+    'relative': function(fn, localeCode, timezoneString) {
       if(isString(fn)) {
         localeCode = fn;
         fn = null;
       }
-      return formatDate(this, fn, true, localeCode);
+      return formatDate(this, fn, true, localeCode, timezoneString);
     },
 
      /***
@@ -8587,15 +8575,15 @@ Date.addLocale('ja', {
   'timeSuffixes': '時,分,秒',
   'ampm': '午前,午後',
   'modifiers': [
-    { 'name': 'day', 'src': '一昨昨昨日|前前前前日', 'value': -4 },
-    { 'name': 'day', 'src': '一昨昨日|前前前日', 'value': -3 },
-    { 'name': 'day', 'src': '一昨日|前前日', 'value': -2 },
+    { 'name': 'day', 'src': '一昨々々日|前々々々日|一昨昨昨日|前前前前日', 'value': -4 },
+    { 'name': 'day', 'src': '一昨々日|前々々日|一昨昨日|前前前日', 'value': -3 },
+    { 'name': 'day', 'src': '一昨日|前々日|前前日', 'value': -2 },
     { 'name': 'day', 'src': '昨日|前日', 'value': -1 },
     { 'name': 'day', 'src': '今日|当日', 'value': 0 },
     { 'name': 'day', 'src': '明日|翌日', 'value': 1 },
-    { 'name': 'day', 'src': '明後日|翌翌日', 'value': 2 },
-    { 'name': 'day', 'src': '明明後日|翌翌翌日', 'value': 3 },
-    { 'name': 'day', 'src': '明明明後日|翌翌翌翌日', 'value': 4 },
+    { 'name': 'day', 'src': '明後日|翌々日|翌翌日', 'value': 2 },
+    { 'name': 'day', 'src': '明々後日|翌々々日|翌翌翌日|明明後日', 'value': 3 },
+    { 'name': 'day', 'src': '明々々後日|翌々々々日|翌翌翌翌日|明明明後日', 'value': 4 },
     { 'name': 'sign', 'src': '前', 'value': -1 },
     { 'name': 'sign', 'src': '後', 'value': 1 },
     { 'name': 'edge', 'src': '始|初日|頭', 'value': 1 },
