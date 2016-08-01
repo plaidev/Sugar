@@ -2853,9 +2853,9 @@
     }).join('|');
   }
 
-  function getNewDate(timezoneString) {
+  function getNewDate(timezoneString, dateFormat) {
     var fn = date.SugarNewDate;
-    return fn && timezoneString ? fn(timezoneString) : new date;
+    return fn && timezoneString ? fn(timezoneString, dateFormat) : (typeof dateFormat !== "undefined" && dateFormat !== null) ? new date(dateFormat) : new date();
   }
 
   // Date argument helpers
@@ -3174,7 +3174,7 @@
         // The Date constructor does something tricky like checking the number
         // of arguments so simply passing in undefined won't work.
         if(f !== 'now') {
-          d = new date(f);
+          d = getNewDate(timezoneString, f);
         }
         if(forceUTC) {
           // Falling back to system date here which cannot be parsed as UTC,

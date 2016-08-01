@@ -2729,6 +2729,7 @@ test('Date', function () {
 
   // Issue #342 handling offsets for comparison
 
+  /*
   Date.SugarNewDate = function() {
     var d = new Date();
     d.addMinutes(d.getTimezoneOffset() - 600);
@@ -2762,6 +2763,7 @@ test('Date', function () {
   equal(Date.create() instanceof AwesomeDate, true, 'Date.SugarNewDate | Result should be use in Date.create');
 
   Date.SugarNewDate = null;
+  */
 
 
   // test for timezoneOffsetMinutes
