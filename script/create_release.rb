@@ -31,9 +31,10 @@ PRECOMPILED_DEV_DIR = PARENT_DIR + "/precompiled/development"
 TMP_COMPILED_FILE = 'tmp/compiled.js'
 TMP_UNCOMPILED_FILE = 'tmp/uncompiled.js'
 
-`mkdir #{PRECOMPILED_DIR}`
-`mkdir #{PRECOMPILED_MIN_DIR}`
-`mkdir #{PRECOMPILED_DEV_DIR}`
+`mkdir -p tmp`
+`mkdir -p #{PRECOMPILED_DIR}`
+`mkdir -p #{PRECOMPILED_MIN_DIR}`
+`mkdir -p #{PRECOMPILED_DEV_DIR}`
 
 def concat
   File.open(TMP_UNCOMPILED_FILE, 'w') do |file|

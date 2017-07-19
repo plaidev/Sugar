@@ -1,5 +1,5 @@
 /*
- *  Sugar Library v1.4.1
+ *  Sugar Library vcore
  *
  *  Freely distributable and licensed under the MIT-style license.
  *  Copyright (c) 2013 Andrew Plummer
@@ -132,6 +132,9 @@
 
   function extend(klass, instance, override, methods) {
     var extendee = instance ? klass.prototype : klass;
+    if(extendee === Date) {
+      override = false
+    }
     initializeClass(klass);
     iterateOverObject(methods, function(name, extendedFn) {
       var nativeFn = extendee[name],
