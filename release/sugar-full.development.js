@@ -132,9 +132,6 @@
 
   function extend(klass, instance, override, methods) {
     var extendee = instance ? klass.prototype : klass;
-    if(extendee === Date) {
-      override = false
-    }
     initializeClass(klass);
     iterateOverObject(methods, function(name, extendedFn) {
       var nativeFn = extendee[name],
