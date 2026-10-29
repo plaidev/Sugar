@@ -14,3 +14,20 @@ test/environments/prototype/
 test/environments/mootools/
 release/copyright.txt
 release/precompiled/
+
+# Local tooling / credentials (never publish)
+.ensemble/
+.search-docs/
+.npmrc
+.cursor/
+
+# Unrelated Sugar 2.x monorepo tree (not part of sugar-old / v1.2.1)
+packages/
+
+# Ad-hoc build outputs at repository root
+/sugar-custom.min.js
+/sugar-custom.min.map
+
+# Editor / OS noise (also in .gitignore; explicit for npm pack)
+.DS_Store
+node_modules/
