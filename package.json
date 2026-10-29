@@ -1,7 +1,7 @@
 {
   "name": "@plaidev/sugar-old",
-  "version": "1.2.1+repack.1",
-  "description": "A Javascript library for working with native objects. Runtime is identical to git tag v1.2.1 (7fce743); this release repacks the npm tarball only.",
+  "version": "1.2.1-repack.1",
+  "description": "A Javascript library for working with native objects. Runtime is identical to git tag v1.2.1 (7fce743); 1.2.1-repack.1 repacks the npm tarball only (npm strips +build metadata on publish).",
   "keywords": ["functional", "utility", "ender"],
   "homepage": "http://sugarjs.com/",
   "author": "Andrew Plummer",
